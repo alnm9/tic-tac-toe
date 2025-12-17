@@ -34,7 +34,7 @@ const GameController = (function (player1, player2) {
     const playBoard = Gameboard();
 
     const showBoard = () => {
-        console.log(playBoard.board);
+        return playBoard.board;
     };
 
     let activePlayer = players[0];
@@ -112,7 +112,6 @@ const GameController = (function (player1, player2) {
             switchTurn();
             getPlayerTurn();
             showBoard();
-
         };
 
     };
@@ -123,3 +122,37 @@ const GameController = (function (player1, player2) {
 
 
 
+
+const GameRender = (function () {
+    const board = GameController.showBoard();
+    const gameDisplayContainer = document.querySelector(".game-container");
+
+    renderBoard();
+
+
+    function renderBoard() {
+
+        if (gameDisplayContainer.childNodes.length > 1) {
+            const boardCells = gameDisplayContainer.querySelectorAll("button");
+            for (let i = 0; i < board.length; i++) {
+                boardCells[i].textContent = board[i];
+            }
+        } else {
+            for (let cell in board) {
+                const boardCell = document.createElement("button");
+                boardCell.classList.add("cell");
+                boardCell.textContent = board[cell];
+                gameDisplayContainer.appendChild(boardCell);
+            }
+        }
+
+
+
+    }
+
+    return { renderBoard }
+    //render gameboard, creating grid cells for every array index
+    //target every board cell to help with sign assignation
+    //function that handles cell clicks
+    //event handler that displays each players sign based on the function handler
+})()
