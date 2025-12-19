@@ -57,7 +57,7 @@ const GameController = (function (player1, player2) {
                     playBoard.board[n1] === playBoard.board[n3] &&
                     playBoard.board[n1] === players[i].sign) {
 
-                    console.log(`Player ${players[i].name} has won!`);
+                    alert(`Player ${players[i].name} has won!`);
                     return true;
 
                 }
@@ -92,26 +92,27 @@ const GameController = (function (player1, player2) {
     getPlayerTurn();
 
 
-    const playRound = (n) => {
+    const playRound = (cell) => {
 
         const cloneBoard = (playBoard.board).map((x) => x);
 
-        console.log(`Player ${activePlayer.name} puts ${activePlayer.sign} in board array index ${n}`);
-        playBoard.board[n] = activePlayer.sign;
+        console.log(`Player ${activePlayer.name} puts ${activePlayer.sign} in board array index ${cell}`);
+        playBoard.board[cell] = activePlayer.sign;
 
-        if (cloneBoard[n] !== "") {
-            playBoard.board[n] = cloneBoard[n];
+        if (cloneBoard[cell] !== "") {
+            playBoard.board[cell] = cloneBoard[cell];
             console.log("Place already occuppied. Try again!");
 
         } else {
 
-            if (checkWinCondition() === true) {
-                resetGame();
+            if (checkWinCondition()) {
+
+                // resetGame();
+                return
             }
 
             switchTurn();
             getPlayerTurn();
-            showBoard();
         };
 
     };
@@ -146,13 +147,17 @@ const GameRender = (function () {
             }
         }
 
-
-
     }
 
-    return { renderBoard }
-    //render gameboard, creating grid cells for every array index
-    //target every board cell to help with sign assignation
-    //function that handles cell clicks
-    //event handler that displays each players sign based on the function handler
+
+    function clickHandler(e) {
+        const cell = e.target;
+        let cellIndex = Array.from(gameDisplayContainer.children).indexOf(cell);
+        GameController.playRound(cellIndex);
+        renderBoard();
+    }
+
+
+    gameDisplayContainer.addEventListener("click", clickHandler);
+
 })()
