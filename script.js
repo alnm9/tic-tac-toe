@@ -10,26 +10,37 @@ function Gameboard() {
 }
 
 
-const MakePlayers = (() => {
-    let player1 = prompt("Player 1 name:");
-    let player2 = prompt("Player 2 name:");
-    return [player1, player2];
-})()
 
-
-
-
-const GameController = (function (player1, player2) {
+const GameController = (function () {
     const players = [
         {
-            name: player1,
+            name: "player1",
             sign: "x"
         },
         {
-            name: player2,
+            name: "player2",
             sign: "0"
         }
     ];
+
+    createPlayers();
+
+    function createPlayers() {
+        let p1 = prompt("Player 1 name:");
+        let p2 = prompt("Player 2 name:");
+        while (p2 == p1) {
+            alert("Can't have same name!");
+            p2 = prompt("Player 2 name:");
+        }
+        players[0].name = p1;
+        players[1].name = p2;
+
+
+
+        if (players[0].name == "" || typeof players[0].name !== "string") players[0].name = "Player 1";
+        if (players[1].name == "" || typeof players[1].name !== "string") players[1].name = "Player 2";
+    }
+
 
 
     const playBoard = Gameboard();
@@ -60,6 +71,14 @@ const GameController = (function (player1, player2) {
                     playBoard.board[n1] === players[i].sign) {
 
                     playBoard.winner = players[i].name;
+
+                    const gameDisplayContainer = document.querySelector(".game-container");
+                    const arrayContainer = Array.from(gameDisplayContainer.children);
+                    arrayContainer[n1].setAttribute("style", "background-color: blue");
+                    arrayContainer[n2].setAttribute("style", "background-color: blue");
+                    arrayContainer[n3].setAttribute("style", "background-color: blue");
+
+
                     return true;
                 }
             }
@@ -82,8 +101,8 @@ const GameController = (function (player1, player2) {
 
     const resetGame = () => {
         console.clear();
-        players[0].name = prompt("Player 1 name:");
-        players[1].name = prompt("Player 2 name:");
+        createPlayers();
+
         activePlayer = players[0];
         for (let i = 0; i < playBoard.board.length; i++) {
             playBoard.board[i] = "";
@@ -126,7 +145,7 @@ const GameController = (function (player1, player2) {
 
     return { getPlayerTurn, playRound, showBoard, resetGame, getWinner };
 
-})(MakePlayers[0], MakePlayers[1]);
+})();
 
 
 
