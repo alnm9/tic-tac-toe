@@ -1,17 +1,16 @@
-function Gameboard() {
-    const board = [];
-    let winner = "";
+const GameController = (function () {
+    function Gameboard() {
+        const board = [];
+        let winner = "";
 
-    for (let i = 0; i <= 8; i++) {
-        board.push("");
+        for (let i = 0; i <= 8; i++) {
+            board.push("");
+        }
+
+        return { board, winner };
     }
 
-    return { board, winner };
-}
 
-
-
-const GameController = (function () {
     const players = [
         {
             name: "player1",
@@ -24,32 +23,34 @@ const GameController = (function () {
     ];
 
     createPlayers();
+    const playBoard = Gameboard();
+    let activePlayer = players[0];
+    let turns = 0;
+
+    const getTurnsNumber = () => turns;
+
 
     function createPlayers() {
         let p1 = prompt("Player 1 name:");
+        if (p1 == "" || typeof p1 !== "string") p1 = "Player 1";
+
+
         let p2 = prompt("Player 2 name:");
+
         while (p2 == p1) {
             alert("Can't have same name!");
             p2 = prompt("Player 2 name:");
         }
+        if (p2 == "" || typeof p2 !== "string") p2 = "Player 2";
+
+
         players[0].name = p1;
         players[1].name = p2;
 
-
-
-        if (players[0].name == "" || typeof players[0].name !== "string") players[0].name = "Player 1";
-        if (players[1].name == "" || typeof players[1].name !== "string") players[1].name = "Player 2";
     }
 
+    const showBoard = () => playBoard.board;
 
-
-    const playBoard = Gameboard();
-
-    const showBoard = () => {
-        return playBoard.board;
-    };
-
-    let activePlayer = players[0];
 
     const switchTurn = () => {
         activePlayer = (activePlayer === players[0]) ? players[1] : players[0];
@@ -59,6 +60,9 @@ const GameController = (function () {
         console.log(`It's ${activePlayer.name}'s turn!`);
         return `It's ${activePlayer.name}'s turn!`;
     };
+
+    const getWinner = () => playBoard.winner;
+
 
 
     const checkWinCondition = () => {
@@ -74,9 +78,9 @@ const GameController = (function () {
 
                     const gameDisplayContainer = document.querySelector(".game-container");
                     const arrayContainer = Array.from(gameDisplayContainer.children);
-                    arrayContainer[n1].setAttribute("style", "background-color: blue");
-                    arrayContainer[n2].setAttribute("style", "background-color: blue");
-                    arrayContainer[n3].setAttribute("style", "background-color: blue");
+                    arrayContainer[n1].setAttribute("style", "background-color: #b73a57c2");
+                    arrayContainer[n2].setAttribute("style", "background-color: #b73a57c2");
+                    arrayContainer[n3].setAttribute("style", "background-color: #b73a57c2");
 
 
                     return true;
@@ -108,6 +112,7 @@ const GameController = (function () {
             playBoard.board[i] = "";
         }
         playBoard.winner = "";
+        turns = 0;
 
         console.log(`Players are -- ${players[0].name} -- and -- ${players[1].name} --!`);
 
@@ -129,21 +134,26 @@ const GameController = (function () {
             alert("Place already occuppied. Try again!");
 
         } else {
-
-            if (checkWinCondition()) {
-                console.log(`${getWinner()} has won!`)
-
-                return
-            }
-
             switchTurn();
+            turns++;
         };
+
+
+
+        if (checkWinCondition()) {
+            console.log(`${getWinner()} has won!`);
+            return;
+        }
+
+
+        if (turns === 9 && playBoard.winner == "") {
+            console.log("It's a draw!");
+            return;
+        }
 
     };
 
-    const getWinner = () => playBoard.winner;
-
-    return { getPlayerTurn, playRound, showBoard, resetGame, getWinner };
+    return { getPlayerTurn, playRound, showBoard, resetGame, getWinner, getTurnsNumber };
 
 })();
 
@@ -152,6 +162,7 @@ const GameController = (function () {
 
 const GameRender = (function () {
     const board = GameController.showBoard();
+
     const gameDisplayContainer = document.querySelector(".game-container");
     const resetBtn = document.querySelector("#start");
 
@@ -160,9 +171,18 @@ const GameRender = (function () {
 
     function renderText() {
         const playerTurnText = document.querySelector("#game-text");
+        playerTurnText.setAttribute("style", "color: white");
+
         playerTurnText.textContent = GameController.getPlayerTurn();
+
         if ((GameController.getWinner()) !== "") {
             playerTurnText.textContent = `${GameController.getWinner()} has won!`;
+            playerTurnText.setAttribute("style", "color: #f1b72f");
+        }
+
+        if (GameController.getWinner() == "" && GameController.getTurnsNumber() === 9) {
+            playerTurnText.textContent = "It's a draw!";
+            playerTurnText.setAttribute("style", "color: #fd5056");
         }
 
     }
@@ -186,7 +206,7 @@ const GameRender = (function () {
         }
 
         boardCells.forEach((cell) => {
-            if ((GameController.getWinner()) !== "") {
+            if ((GameController.getWinner()) !== "" || (GameController.getWinner() == "" && GameController.getTurnsNumber() === 9)) {
                 cell.disabled = true;
             }
         })
@@ -211,5 +231,4 @@ const GameRender = (function () {
 
     gameDisplayContainer.addEventListener("click", clickHandler);
     resetBtn.addEventListener("click", resetGame);
-
 })()
